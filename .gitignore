@@ -1,0 +1,8 @@
+#ignore the .csv data files
+*.csv
+
+#ignore the Mac file
+.DS_Store
+
+#Rstudio Runtime files
+.R*
