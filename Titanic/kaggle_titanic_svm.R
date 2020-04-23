@@ -9,6 +9,9 @@ train = train[, -c(1,4,9,11)]
 #Rearrange to put dependent varaible in last column
 train = train[c(2:8,1)]
 
+which(c(FALSE, FALSE, FALSE, TRUE))
+
+
 #find NA values
 for (i in 1:length(train)){
   if (length(which(is.na(train[i]))) != 0){
