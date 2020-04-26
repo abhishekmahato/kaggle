@@ -55,7 +55,9 @@ surv_rate_3 = sr[3,2]/sum(sr[3,]) #34%
 
 #Rest
 cor(train[, 3:6], method = 'pearson')
-
+install.packages('corrplot')
+library(corrplot)
+corrplot(cor(train[, 3:6], method = 'pearson'))
 ggplot()+
   geom_point(aes(x = train$SibSp, y = train$Survived),
              color = 'red')
@@ -64,19 +66,48 @@ sr = table(train[, 4], train[, 8])
 sr
 
 
-ggplot() +
-  geom_point(aes(x = test$YearsExperience, y = test$Salary),
-             color = 'red') +
-  geom_line(aes(x = train$YearsExperience, y = predict(linreg, newdata = train)),
-            color = 'green') +
-  ggtitle ('Exp vs Salary (Test)') +
-  xlab ('Years') +
-  ylab ('Salary')
 
+histogram(train[, 3], type='count', main = 'Age distribution', xlab = 'Age')
 
+plot(train[, c(3,5)], col=train[,8])
+points(train[,8], pch = 21, bg = ifelse(train[,8] == 0, 'red', 'green'))
+ggplot(train, aes(y = train[,8], x = train[, 3], fill=train[,2]))+
+          geom_bar(stat = 'identity', position = 'dodge')
 
+#install.packages('dslabs')
+library(dslabs)
+library(tidyverse)
+data(heights)
+summary(heights)
+p = seq(0.01, 0.99, 0.01)
+percentile = quantile(heights$height, p)
+percentile
+#install.packages('tidyverse')
 
-histogram(train[, 8], type='count', )
-ggplot(train, aes(y = train[,8], x = train[, 1]))+
-         geom_bar(stat = 'identity', position = 'dodge')
+data(murders)
+names(murders)
+p = murders %>% ggplot() +
+  geom_point(aes(x = population/10^6, y = total)) +
+  geom_text(aes(x = population/10^6, y = total, label = abb))+
+  geom_abline(aes(x = muders$population/10^6, y = murders$total),
+              data = murders, 0, r)
+  
+r = summarize(murders, rate = sum(murders$total) / sum(murders$population) * 10^6)
+data(starwars)
+
+starwars
+starwars %>%
+  mutate(mass / mean(mass, na.rm = TRUE)) %>%
+  pull()
+
+starwars %>%
+  group_by(gender) %>%
+  mutate(mass / mean(mass, na.rm = TRUE)) %>%
+  pull()
+
+p = murders %>% group_by(region) %>%
+  summarize(median = median(total))
+
+murders %>% arrange(region, population) 
+
 
