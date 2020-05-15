@@ -247,13 +247,15 @@ train %>% ggplot(aes(Survived, fill = Sex)) +
 train %>% ggplot(aes(Sex, fill = factor(Survived))) +
   geom_bar()
 
+
+
 train %>% group_by(Survived) %>%
   summarize(prop = n()/(train %>% summarize(n =n()))$n) %>%
   knitr::kable()
 
 #Question 5
 train %>%
-  ggplot(aes(Age, y = after_stat(count), fill = factor(Survived))) +
+  ggplot(aes(Age, y = stat(count), fill = factor(Survived))) +
   geom_density(alpha = 0.2) +
   scale_x_continuous(breaks = c(0, 8, 18, 30, 50, 70, 80)) +
   geom_vline(xintercept = c(0, 8, 18, 30, 50, 70, 80))
@@ -282,5 +284,15 @@ train %>% filter(!is.na(Age)) %>%
   geom_density(aes(y = after_stat(count), alpha = 0.2)) +
   facet_grid(Sex ~ Pclass)
 
+################################################
+#Regex Code
+
+#install.packages('stringr')
+library(stringr)
+data(words)
+x = words
+str_view(x, "\\b[\\w]{7}\\w*\\b", match = TRUE)
+x = c("apple pie", "apple", "apple cake")
+x
 
 

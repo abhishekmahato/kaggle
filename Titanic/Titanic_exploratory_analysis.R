@@ -1,4 +1,5 @@
 #get data
+options(digits = 3)
 train = read.csv("train.csv", na.strings = c('', 'NA'))
 train = train[, -c(1,4,9,11)]
 train = train[, c(2:8,1)]
@@ -33,44 +34,76 @@ train[8] = factor(train[, 8],
                   levels = c(0,1),
                   labels = c(0,1))
 
-#Gender
-sr = table(train[, 2], train[, 8])
-sr
-surv_rate_f = sr[1,2]/sum(sr[1,]) #74%
-surv_rate_m = sr[2,2]/sum(sr[2,]) #19%
+#Analysis
+#gender
+library(tidyverse)
+train %>% ggplot(aes(Survived, fill = Sex)) +
+  geom_bar(position = 'fill')
 
-#class
-sr = table(train[, 1], train[, 8])
-sr
-surv_rate_1 = sr[1,2]/sum(sr[1,]) #63%
-surv_rate_2 = sr[2,2]/sum(sr[2,]) #47%
-surv_rate_3 = sr[3,2]/sum(sr[3,]) #24%
+library(tidyverse)
+train %>% ggplot(aes(Sex, fill = Survived)) +
+  geom_bar(position = 'fill')
 
-#Embarked
-sr = table(train[, 7], train[, 8])
-sr
-surv_rate_1 = sr[1,2]/sum(sr[1,]) #56%
-surv_rate_2 = sr[2,2]/sum(sr[2,]) #39%
-surv_rate_3 = sr[3,2]/sum(sr[3,]) #34%
+train %>% group_by(Sex) %>%
+  summarize( survived = length(which(Survived == 1))/n(),
+             died = length(which(Survived == 0))/n()) %>%
+  knitr::kable()
 
-#Rest
-cor(train[, 3:6], method = 'pearson')
-install.packages('corrplot')
-library(corrplot)
-corrplot(cor(train[, 3:6], method = 'pearson'))
-ggplot()+
-  geom_point(aes(x = train$SibSp, y = train$Survived),
-             color = 'red')
+train %>% group_by(Survived) %>%
+  summarize( male = length(which(Sex == 'male'))/n(),
+             female = length(which(Sex == 'female'))/n()) %>%
+  knitr::kable()
 
-sr = table(train[, 4], train[, 8])
-sr
+train %>% ggplot(aes(Age, y = after_stat(count), fill = Survived)) +
+  geom_density(alpha = 0.2) +
+  facet_grid(. ~ Sex)
+  
+train %>% ggplot(aes(Age, fill = Survived)) +
+  geom_histogram(binwidth = 10, position = 'fill') +
+  facet_grid(. ~ Sex)+
+  scale_x_continuous(n.breaks = 10)
+
+train %>% filter(!is.na(Fare)) %>%
+  ggplot(aes(x = Survived, y = Fare)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.2) +
+  scale_y_continuous(trans = 'log2') 
+  
+train %>% filter(!is.na(Fare)) %>%
+  ggplot(aes(Fare, fill = Survived)) +
+  geom_density(alpha = 0.2, bw = 0.5) + 
+  scale_x_continuous(trans = 'log2', n.breaks = 10) +
+  facet_grid(Pclass ~ .)
+
+train %>% ggplot(aes(Parch, fill = Survived)) +
+  geom_bar(position = 'dodge') +
+  scale_y_continuous(trans = 'log2') + 
+  scale_x_continuous(n.breaks = 6)
+train %>% ggplot(aes(SibSp, fill = Survived)) +
+  geom_bar(position = 'dodge') +
+  scale_y_continuous(trans = 'log2') + 
+  scale_x_continuous(n.breaks = 6)
 
 
+train %>% ggplot(aes(Survived, Age, fill = Survived)) +
+  geom_boxplot()+
+  facet_grid(. ~ Parch)
+train %>% ggplot(aes(Survived, Age, fill = Survived)) +
+  geom_boxplot()+
+  facet_grid(. ~ SibSp)
 
-histogram(train[, 3], type='count', main = 'Age distribution', xlab = 'Age')
 
-plot(train[, c(3,5)], col=train[,8])
-points(train[,8], pch = 21, bg = ifelse(train[,8] == 0, 'red', 'green'))
-ggplot(train, aes(y = train[,8], x = train[, 3], fill=train[,2]))+
-          geom_bar(stat = 'identity', position = 'dodge')
+train %>% ggplot(aes(x = Pclass, fill = Survived)) +
+  geom_bar(position = 'fill') +
+  facet_grid(Embarked ~ Sex) +
+  scale_y_continuous()
+
+
+train %>% apply(MARGIN = 2, unique)
+summary(train)
+head(train)
+
+head(train$Name, 20)
+
+
 
