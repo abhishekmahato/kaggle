@@ -6,3 +6,6 @@
 
 #Rstudio Runtime files
 .R*
+
+#python virtual environment
+kaggle/*
